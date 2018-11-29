@@ -43,15 +43,15 @@ class TypeConverter
                 return $value->toBSONType();
             case $value instanceof BSON\Type:
                 return $value;
-            case is_array($value):
-            case is_object($value):
+            case \is_array($value):
+            case \is_object($value):
                 $result = [];
 
                 foreach ($value as $key => $item) {
                     $result[$key] = self::fromLegacy($item);
                 }
 
-                return self::ensureCorrectType($result, is_object($value));
+                return self::ensureCorrectType($result, \is_object($value));
             default:
                 return $value;
         }
@@ -75,8 +75,8 @@ class TypeConverter
         switch (true) {
             case $value instanceof BSON\Type:
                 return self::convertBSONObjectToLegacy($value);
-            case is_array($value):
-            case is_object($value):
+            case \is_array($value):
+            case \is_object($value):
                 $result = [];
 
                 foreach ($value as $key => $item) {
@@ -103,16 +103,16 @@ class TypeConverter
      */
     public static function convertProjection($fields)
     {
-        if (! is_array($fields) || $fields === []) {
+        if (! \is_array($fields) || $fields === []) {
             return null;
         }
 
         if (! TypeConverter::isNumericArray($fields)) {
             $projection = TypeConverter::fromLegacy($fields);
         } else {
-            $projection = array_fill_keys(
-                array_map(function ($field) {
-                    if (!is_string($field)) {
+            $projection = \array_fill_keys(
+                \array_map(function ($field) {
+                    if (!\is_string($field)) {
                         throw new \MongoException('field names must be strings', 8);
                     }
 
@@ -142,10 +142,10 @@ class TypeConverter
             return true;
         }
 
-        $keys = array_keys($array);
+        $keys = \array_keys($array);
         // array_keys gives us a clean numeric array with keys, so we expect an
         // array like [0 => 0, 1 => 1, 2 => 2, ..., n => n]
-        return array_values($keys) === array_keys($keys);
+        return \array_values($keys) === \array_keys($keys);
     }
 
     /**
@@ -175,7 +175,7 @@ class TypeConverter
                 return new \MongoDate($value);
             case $value instanceof Model\BSONDocument:
             case $value instanceof Model\BSONArray:
-                return array_map(
+                return \array_map(
                     ['self', 'toLegacy'],
                     $value->getArrayCopy()
                 );
